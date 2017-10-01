@@ -41,10 +41,10 @@ class RenderChunk extends Component {
   }
 
   controllerScroll = () => {
-    if (this.scrollEnd()) {
+    if (this.scrollBottom()) {
       this.nextLoad()
     }
-    if (this.scrollBegin()) {
+    if (this.scrollTop()) {
       console.log('scrollBegin')
       this.prevLoad()
     }
@@ -81,7 +81,7 @@ class RenderChunk extends Component {
     })
   }
 
-  scrollEnd = () => {
+  scrollBottom = () => {
     const heightWin = window.document.documentElement.clientHeight
     const scrollTop = window.document.body.scrollTop
     const heightAll = window.document.documentElement.scrollHeight
@@ -90,7 +90,7 @@ class RenderChunk extends Component {
     }
     return heightWin + scrollTop === heightAll
   }
-  scrollBegin = () => {
+  scrollTop = () => {
     const scrollTop = window.document.body.scrollTop
     return !scrollTop
   }

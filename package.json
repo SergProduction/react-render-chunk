@@ -15,9 +15,7 @@
   "dependencies": {
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "react-router-dom": "^4.1.1",
-    "webpack-merge": "^4.1.0"
+    "react-dom": "^15.6.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
@@ -35,6 +33,7 @@
     "uglify-js": "^3.0.28",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^2.6.1",
+    "webpack-merge": "^4.1.0",
     "webpack-dev-server": "^2.5.0"
   }
 }
