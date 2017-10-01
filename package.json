@@ -1,0 +1,40 @@
+{
+  "name": "react-render-chunk",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint src",
+    "auto-fix": "eslint src--fix",
+    "dev": "NODE_ENV=serv webpack-dev-server",
+    "prod": "NODE_ENV=prod webpack",
+    "compile": "webpack"
+  },
+  "author": "sdweb",
+  "license": "ISC",
+  "dependencies": {
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-router-dom": "^4.1.1",
+    "webpack-merge": "^4.1.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-lodash": "^3.2.11",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^3.19.0",
+    "eslint-config-atomix-react": "^1.0.0",
+    "react-addons-perf": "^15.4.2",
+    "uglify-js": "^3.0.28",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.5.0"
+  }
+}

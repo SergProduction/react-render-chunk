@@ -1,0 +1,14 @@
+{
+  "extends": "atomix-react",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "consistent-return": "warn",
+    "unicorn/explicit-length-check": 0
+  }
+}
