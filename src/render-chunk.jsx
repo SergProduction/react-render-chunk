@@ -70,8 +70,8 @@ class RenderChunk extends Component {
       return false
     }
     console.log(allChunk, lastIndex)
-    const firstChunk = allChunk.slice(lastIndex - viewCount, lastIndex)
-    const lastChunk = allChunk.slice(lastIndex, lastIndex + viewCount)
+    const firstChunk = allChunk.slice(lastIndex - (viewCount * 3), lastIndex - (viewCount * 2))
+    const lastChunk = allChunk.slice(lastIndex - (viewCount * 2), lastIndex - viewCount)
     const chunk = firstChunk.concat(lastChunk)
     this.setState({
       param: {
