@@ -27,9 +27,6 @@ class RenderChunk extends Component {
       scrollTopStore: [],
       directionScroll: true, // true - down, false - up
     }
-    window.addEventListener('scroll', (e) => {
-      this.controllerScroll()
-    })
     this.style = {
       overflowY: 'hidden',
       maxHeight: mapProp.height,
@@ -37,6 +34,9 @@ class RenderChunk extends Component {
   }
 
   componentWillMount = () => {
+    window.addEventListener('scroll', (e) => {
+      this.controllerScroll()
+    })
     emitter.subscribe(this.chunkRender)
   }
 
@@ -54,7 +54,8 @@ class RenderChunk extends Component {
 
   chunkRender = () => {
     console.log('chunkRender')
-    const { scrollTopStore } = this.state
+    const { scrollTopStore, directionScroll } = this.state
+    if (directionScroll) return
     const backScroll = scrollTopStore[scrollTopStore.length - 1]
     setTimeout(() => {
       window.scrollTo(document.documentElement.scrollLeft, backScroll)
@@ -110,9 +111,9 @@ class RenderChunk extends Component {
 
 
   scrollBottom = () => {
-    const heightWin = window.document.documentElement.clientHeight
-    const scrollTop = window.document.documentElement.scrollTop
     const heightAll = window.document.documentElement.scrollHeight
+    const heightWin = window.document.documentElement.clientHeight
+    const scrollTop = window.pageYOffset
     if (window.document.body.clientHeight < heightWin) {
       return false
     }
@@ -120,11 +121,11 @@ class RenderChunk extends Component {
   }
 
   scrollTop = () => {
-    const scrollTop = window.document.documentElement.scrollTop
+    const scrollTop = window.pageYOffset
     return !scrollTop
   }
 
-  scrollTopData = () => window.document.documentElement.scrollTop
+  scrollTopData = () => window.pageYOffset
 
   prevChunkHeight = () => {
     const { scrollTopStore } = this.state
