@@ -15,7 +15,7 @@ class FakeData {
 
   createData = (len) => {
     const data = new Array(len).fill(0).map((el, i) => ({
-      id: i,
+      id: i + 1,
       name: Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5),
       list: new Array(10).fill(0).map(() => randomRange(0, 5)),
     }))

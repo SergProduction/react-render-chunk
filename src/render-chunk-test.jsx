@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import FakeData from './fake-data'
-import chunkRender from './render-chunk'
+import chunkRender, { listenRender } from './render-chunk'
 
 const style = {
   ul: {
@@ -26,12 +26,12 @@ class TestChunkRender extends Component {
     const fakeList = new FakeData(100)
     setTimeout(() => {
       // this.setState({ list: new FakeData(100) })
-      this.props.setChunks({ list: fakeList.all }, 10)
+      this.props.setChunks(fakeList.all, 10)
     }, 1000)
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    this.props.chunkRender()
+  componentDidUpdate(prevProps, prevState) {
+    listenRender(prevProps, this.props)
   }
 
   render() {
