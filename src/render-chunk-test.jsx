@@ -30,9 +30,12 @@ class TestChunkRender extends Component {
     }, 1000)
   }
 
+  componentDidUpdate = (prevProps, prevState) => {
+    this.props.chunkRender()
+  }
+
   render() {
     const { list } = this.props
-    console.log(this.props)
     if (!list || !list.length) return (<p>no data</p>)
     return (
       <ul style={style.ul}>

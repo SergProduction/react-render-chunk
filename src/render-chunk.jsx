@@ -11,6 +11,7 @@ class RenderChunk extends Component {
       viewCount: 0,
       lastIndex: 0,
       propName: '',
+      scrollTopStore: [],
     }
     window.addEventListener('scroll', (e) => {
       this.controllerScroll()
@@ -45,40 +46,47 @@ class RenderChunk extends Component {
       this.nextLoad()
     }
     if (this.scrollTop()) {
-      console.log('scrollBegin')
       this.prevLoad()
     }
   }
 
   nextLoad = () => {
     const { allChunk, lastIndex, viewCount, propName } = this.state
-
+    console.log('nextLoad', lastIndex)
     const firstChunk = allChunk.slice(lastIndex - viewCount, lastIndex)
     const lastChunk = allChunk.slice(lastIndex, lastIndex + viewCount)
     const chunk = firstChunk.concat(lastChunk)
-    this.setState({
+    this.setState(prev => ({
       param: {
         [propName]: chunk,
       },
       lastIndex: lastIndex + viewCount,
-    })
+      scrollTopStore: prev.scrollTopStore.concat(this.scrollTopData()),
+    }))
   }
 
   prevLoad = () => {
-    const { allChunk, lastIndex, viewCount, propName } = this.state
+    const { allChunk, lastIndex, viewCount, propName, scrollTopStore } = this.state
+    console.log('prevLoad', lastIndex)
     if (lastIndex === viewCount) {
       return false
     }
-    console.log(allChunk, lastIndex)
     const firstChunk = allChunk.slice(lastIndex - (viewCount * 3), lastIndex - (viewCount * 2))
     const lastChunk = allChunk.slice(lastIndex - (viewCount * 2), lastIndex - viewCount)
     const chunk = firstChunk.concat(lastChunk)
-    this.setState({
+    const backScroll = scrollTopStore[scrollTopStore.length - 1] - 3
+    this.setState(prev => ({
       param: {
         [propName]: chunk,
       },
       lastIndex: lastIndex - viewCount,
-    })
+      scrollTopStore: prev.scrollTopStore.slice(0, prev.scrollTopStore.length - 1),
+    }))
+  }
+
+  chunkRender = () => {
+    console.log('chunkRender')
+    window.scrollTo(document.body.scrollLeft, document.body.scrollHeight / 2)
   }
 
   scrollBottom = () => {
@@ -95,6 +103,8 @@ class RenderChunk extends Component {
     return !scrollTop
   }
 
+  scrollTopData = () => window.document.body.scrollTop
+
   render() {
     const { param } = this.state
     if (mapProp.height) {
@@ -104,7 +114,7 @@ class RenderChunk extends Component {
         </div>
       )
     }
-    return <ReactComponents setChunks={this.setChunks} {...param} {...this.props} />
+    return <ReactComponents setChunks={this.setChunks} chunkRender={this.chunkRender} {...param} {...this.props} />
   }
 }
 
