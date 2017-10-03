@@ -14,7 +14,17 @@ function oneEmmiter() {
 
 const emitter = oneEmmiter()
 
-const chunkRender = (mapProp = {}) => ReactComponent =>
+const decorateListenUpdateComponent = ReactComponent =>
+class extends ReactComponent {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.list !== this.props.list) {
+      emitter.emit()
+    }
+    super.componentDidUpdate(prevProps, prevState)
+  }
+}
+
+const chunkRender = (mapProp, ReactComponent) =>
 class RenderChunk extends Component {
   static displayName = `chunkRender(${ReactComponent.displayName || ReactComponent.name || 'Component'})`
   constructor(props) {
@@ -34,10 +44,12 @@ class RenderChunk extends Component {
   }
 
   componentWillMount = () => {
-    window.addEventListener('scroll', (e) => {
-      this.controllerScroll()
-    })
+    window.addEventListener('scroll', this.controllerScroll)
     emitter.subscribe(this.chunkRender)
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('scroll', this.controllerScroll)
   }
 
   setChunks = (allChunk, viewCount) => {
@@ -149,10 +161,6 @@ class RenderChunk extends Component {
   }
 }
 
-export const listenRender = (prev, next) => {
-  if (prev.list !== next.list) {
-    emitter.emit()
-  }
-}
-
-export default chunkRender
+export default (param = {}) =>
+                ReactComponent =>
+                chunkRender(param, decorateListenUpdateComponent(ReactComponent))
