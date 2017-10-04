@@ -95,17 +95,20 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
     chunkRerender = () => {
       console.log('chunkRender')
       const { heightChunksStore, directionScroll } = this.state
-      const backScroll = heightChunksStore[heightChunksStore.length - 1]
+      let heightChunkPrev = heightChunksStore[heightChunksStore.length - 2]
+      heightChunkPrev = heightChunkPrev || heightChunksStore[heightChunksStore.length - 1]
+      const heightChunkCurrent = heightChunksStore[heightChunksStore.length - 1]
 
       if (!directionScroll) {
         setTimeout(() => {
-          window.scrollTo(document.documentElement.scrollLeft, backScroll)
+          window.scrollTo(document.documentElement.scrollLeft, heightChunkPrev)
         })
         return
       }
 
-      if (directionScroll && isScrollBottom()) {
+      if (directionScroll && isScrollBottom()) { // if fail auto scroll bottom
         console.warn('FAIL')
+        const backScroll = heightChunkCurrent - window.document.documentElement.clientHeight
         setTimeout(() => {
           window.scrollTo(document.documentElement.scrollLeft, backScroll)
         })
@@ -140,7 +143,7 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
         },
         lastIndex: lastIndex + viewCount,
         directionScroll: true,
-        heightChunksStore: prev.heightChunksStore.concat(this.prevChunkHeight()),
+        heightChunksStore: prev.heightChunksStore.concat(this.getChunkHeight()),
       }))
     }
 
@@ -166,15 +169,16 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
       }))
     }
 
-    prevChunkHeight = () => {
+    getChunkHeight = () => {
       const { heightChunksStore } = this.state
       const len = heightChunksStore.length
+      const heightAll = window.document.body.scrollHeight
 
       if (len >= 1) {
-        return window.document.documentElement.scrollHeight - heightChunksStore[len - 1]
+        return heightAll - heightChunksStore[len - 1]
       }
 
-      return window.document.documentElement.scrollHeight
+      return heightAll
     }
 
     render() {
