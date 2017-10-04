@@ -15,27 +15,24 @@ const style = {
 }
 
 class TestChunkRender extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      list: [],
-    }
-  }
-  componentDidUpdate() {
-
+  state = {
+    list: [],
   }
 
   componentDidMount() {
-    const fakeList = new FakeData(20000)
-    setTimeout(() => {
-      // this.setState({ list: new FakeData(100) })
+    setTimeout(() => { // emulate ajax
+      const fakeList = new FakeData(20000)
       this.props.setChunks(fakeList.all, 10)
-    }, 1000)
+    }, 500)
   }
 
   render() {
     const { list } = this.props
-    if (!list || !list.length) return (<p>no data</p>)
+
+    if (!list || !list.length) {
+      return (<p>no data</p>)
+    }
+
     return (
       <ul style={style.ul}>
         {list.map(el => (
