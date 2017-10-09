@@ -4,19 +4,21 @@ import React, { Component } from 'react'
  * Create simple EventEmitter
  * @return {Object} EventEmitter instance
  */
-function oneEmmiter() {
-  let state = () => {}
+function eventEmitter() {
+  const state = {}
   return {
-    subscribe: (fn) => {
-      state = fn
+    subscribe: (channel, fn) => {
+      state[channel] = fn
     },
-    emit: (...param) => {
-      state(...param)
+    emit: (channel, ...param) => {
+      if (state[channel]) {
+        state[channel](...param)
+      }
     },
   }
 }
 
-const emitter = oneEmmiter()
+const emitter = eventEmitter()
 
 /**
  * @param {Component} ReactComponent
@@ -26,7 +28,7 @@ const decorateListenUpdateComponent = ReactComponent => (
   class extends ReactComponent {
     componentDidUpdate(prevProps, prevState) {
       if (prevProps.list !== this.props.list) {
-        emitter.emit()
+        emitter.emit('rerender', this.wrapChunk)
       }
       if (super.componentDidUpdate) {
         super.componentDidUpdate(prevProps, prevState)
@@ -69,15 +71,41 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
         overflowY: 'hidden',
         maxHeight: mapProp.height,
       }
+      this.stopSrcoll = false
+      this.indent = 0
     }
 
     componentWillMount = () => {
       window.addEventListener('scroll', this.controllerScroll)
-      emitter.subscribe(this.chunkRerender)
+      emitter.subscribe('rerender', (wrapChunk) => {
+        if (!this.wrapChunk) {
+          this.wrapChunk = wrapChunk
+        }
+        this.chunkRerender()
+      })
     }
 
     componentWillUnmount = () => {
       window.removeEventListener('scroll', this.controllerScroll)
+    }
+
+    getChunkHeight = () => {
+      const { heightChunksStore } = this.state
+      const len = heightChunksStore.length
+      const docHeight = document.documentElement.scrollHeight
+
+      let chunkHeight = 0
+      if (this.wrapChunk) {
+        chunkHeight = this.wrapChunk.scrollHeight
+        this.indent = docHeight - chunkHeight
+      }
+
+
+      if (len >= 1) {
+        return (docHeight - heightChunksStore[len - 1]) + this.indent
+      }
+
+      return docHeight
     }
 
     setChunks = (allChunk, viewCount) => {
@@ -100,22 +128,32 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
       const heightChunkCurrent = heightChunksStore[heightChunksStore.length - 1]
 
       if (!directionScroll) {
+        console.log('scrollTo:', heightChunkPrev, this.indent)
         setTimeout(() => {
-          window.scrollTo(document.documentElement.scrollLeft, heightChunkPrev)
+          window.scrollTo(document.documentElement.scrollLeft, heightChunkPrev - this.indent)
+          this.stopSrcoll = false
         })
         return
       }
 
+      const backScroll = heightChunkCurrent - window.document.documentElement.clientHeight
+
       if (directionScroll && isScrollBottom()) { // if fail auto scroll bottom
         console.warn('FAIL')
-        const backScroll = heightChunkCurrent - window.document.documentElement.clientHeight
-        setTimeout(() => {
-          window.scrollTo(document.documentElement.scrollLeft, backScroll)
-        })
+        window.scrollTo(document.documentElement.scrollLeft, backScroll)
+        this.stopSrcoll = false
+      }
+      else {
+        window.scrollTo(document.documentElement.scrollLeft, backScroll)
+        this.stopSrcoll = false
       }
     }
 
     controllerScroll = () => {
+      if (this.stopSrcoll) {
+        console.log('Stop Srcoll')
+        return
+      }
       console.log('controllerScroll')
       if (isScrollBottom()) {
         this.nextLoad()
@@ -132,11 +170,11 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
       if (lastIndex > allChunk.length - viewCount) {
         return false
       }
-
       const firstChunk = allChunk.slice(lastIndex - viewCount, lastIndex)
       const lastChunk = allChunk.slice(lastIndex, lastIndex + viewCount)
       const chunk = firstChunk.concat(lastChunk)
 
+      this.stopSrcoll = true
       this.setState(prev => ({
         param: {
           list: chunk,
@@ -159,6 +197,7 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
       const lastChunk = allChunk.slice(lastIndex - (viewCount * 2), lastIndex - viewCount)
       const chunk = firstChunk.concat(lastChunk)
 
+      this.stopSrcoll = true
       this.setState(prev => ({
         param: {
           list: chunk,
@@ -167,18 +206,6 @@ const chunkRender = (mapProp = {}) => TargetComponent => (
         directionScroll: false,
         heightChunksStore: prev.heightChunksStore.slice(0, prev.heightChunksStore.length - 1),
       }))
-    }
-
-    getChunkHeight = () => {
-      const { heightChunksStore } = this.state
-      const len = heightChunksStore.length
-      const heightAll = window.document.body.scrollHeight
-
-      if (len >= 1) {
-        return heightAll - heightChunksStore[len - 1]
-      }
-
-      return heightAll
     }
 
     render() {

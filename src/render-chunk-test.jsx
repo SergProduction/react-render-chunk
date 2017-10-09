@@ -34,7 +34,12 @@ class TestChunkRender extends Component {
     }
 
     return (
-      <ul style={style.ul}>
+      <ul
+        style={style.ul}
+        ref={(wrap) => {
+          this.wrapChunk = wrap
+        }}
+      >
         {list.map(el => (
           <li key={el.id} style={style.li}>{`id ${el.id}. ${el.name}`}</li>
         ))}
